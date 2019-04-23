@@ -16,7 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.mvvm.todoapp.data.Task;
+import com.example.android.mvvm.todoapp.data.source.TasksDataSource;
 import com.google.common.collect.Lists;
 
 import java.util.Iterator;

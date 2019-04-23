@@ -31,9 +31,10 @@ import android.content.Intent;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.TestUtils;
 import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
+import com.example.android.mvvm.todoapp.data.Task;
+import com.example.android.mvvm.todoapp.data.source.TasksRepository;
+import com.example.android.mvvm.todoapp.taskdetail.TaskDetailActivity;
+import com.example.android.mvvm.todoapp.util.EspressoIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
