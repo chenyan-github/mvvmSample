@@ -61,7 +61,7 @@ public class TasksViewModel extends ViewModel {
 
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
-    private final TasksRepository mTasksRepository;
+    private TasksRepository mTasksRepository;
 
     // Not used at the moment
     private final MutableLiveData<Boolean> mIsDataLoadingError = new MutableLiveData<>();
@@ -80,8 +80,8 @@ public class TasksViewModel extends ViewModel {
                 }
             });
 
-    public TasksViewModel(TasksRepository repository) {
-        mTasksRepository = repository;
+    public void setmTasksRepository(TasksRepository mTasksRepository) {
+        this.mTasksRepository = mTasksRepository;
 
         // Set initial state
         setFiltering(TasksFilterType.ALL_TASKS);

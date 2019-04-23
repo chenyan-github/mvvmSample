@@ -50,7 +50,7 @@ public class AddEditTaskViewModel extends ViewModel implements TasksDataSource.G
 
     private final MutableLiveData<Event<Object>> mTaskUpdated = new MutableLiveData<>();
 
-    private final TasksRepository mTasksRepository;
+    private TasksRepository mTasksRepository;
 
     @Nullable
     private String mTaskId;
@@ -61,8 +61,8 @@ public class AddEditTaskViewModel extends ViewModel implements TasksDataSource.G
 
     private boolean mTaskCompleted = false;
 
-    public AddEditTaskViewModel(TasksRepository tasksRepository) {
-        mTasksRepository = tasksRepository;
+    public void setmTasksRepository(TasksRepository mTasksRepository) {
+        this.mTasksRepository = mTasksRepository;
     }
 
     public void start(String taskId) {

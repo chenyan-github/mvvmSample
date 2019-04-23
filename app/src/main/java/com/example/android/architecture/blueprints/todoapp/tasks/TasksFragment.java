@@ -17,12 +17,10 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.example.android.architecture.blueprints.todoapp.Event;
@@ -31,26 +29,48 @@ import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefre
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
+import com.example.android.mvvm.base.BaseFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
-public class TasksFragment extends Fragment {
-
-    private TasksViewModel mTasksViewModel;
-
-    private TasksFragBinding mTasksFragBinding;
+public class TasksFragment extends BaseFragment<TasksFragBinding, TasksViewModel> {
 
     private TasksAdapter mListAdapter;
+
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.tasks_frag;
+    }
+
+    @Override
+    protected void initView() {
+        mViewModel = obtainViewModel(getActivity(), TasksViewModel.class);
+        mViewDatabinding.setViewmodel(mViewModel);
+        mViewDatabinding.setLifecycleOwner(getActivity());
+
+        setHasOptionsMenu(true);
+
+        setupSnackbar();
+
+        setupFab();
+
+        setupListAdapter();
+
+        setupRefreshLayout();
+    }
+
+    @Override
+    protected void initData(Bundle savedInstanceState) {
+
+    }
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -63,36 +83,20 @@ public class TasksFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mTasksViewModel.start();
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        mTasksFragBinding = TasksFragBinding.inflate(inflater, container, false);
-
-        mTasksViewModel = TasksActivity.obtainViewModel(getActivity());
-
-        mTasksFragBinding.setViewmodel(mTasksViewModel);
-        mTasksFragBinding.setLifecycleOwner(getActivity());
-
-        setHasOptionsMenu(true);
-
-        return mTasksFragBinding.getRoot();
+        mViewModel.start();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mTasksViewModel.clearCompletedTasks();
+                mViewModel.clearCompletedTasks();
                 break;
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mTasksViewModel.loadTasks(true);
+                mViewModel.loadTasks(true);
                 break;
         }
         return true;
@@ -103,21 +107,8 @@ public class TasksFragment extends Fragment {
         inflater.inflate(R.menu.tasks_fragment_menu, menu);
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setupSnackbar();
-
-        setupFab();
-
-        setupListAdapter();
-
-        setupRefreshLayout();
-    }
-
     private void setupSnackbar() {
-        mTasksViewModel.getSnackbarMessage().observe(this, new Observer<Event<Integer>>() {
+        mViewModel.getSnackbarMessage().observe(this, new Observer<Event<Integer>>() {
             @Override
             public void onChanged(Event<Integer> event) {
                 Integer msg = event.getContentIfNotHandled();
@@ -136,16 +127,16 @@ public class TasksFragment extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.active:
-                        mTasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS);
+                        mViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS);
                         break;
                     case R.id.completed:
-                        mTasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        mViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS);
                         break;
                     default:
-                        mTasksViewModel.setFiltering(TasksFilterType.ALL_TASKS);
+                        mViewModel.setFiltering(TasksFilterType.ALL_TASKS);
                         break;
                 }
-                mTasksViewModel.loadTasks(false);
+                mViewModel.loadTasks(false);
                 return true;
             }
         });
@@ -160,25 +151,25 @@ public class TasksFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTasksViewModel.addNewTask();
+                mViewModel.addNewTask();
             }
         });
     }
 
     private void setupListAdapter() {
-        ListView listView =  mTasksFragBinding.tasksList;
+        ListView listView =  mViewDatabinding.tasksList;
 
         mListAdapter = new TasksAdapter(
                 new ArrayList<Task>(0),
-                mTasksViewModel,
+                mViewModel,
                 getActivity()
         );
         listView.setAdapter(mListAdapter);
     }
 
     private void setupRefreshLayout() {
-        ListView listView =  mTasksFragBinding.tasksList;
-        final ScrollChildSwipeRefreshLayout swipeRefreshLayout = mTasksFragBinding.refreshLayout;
+        ListView listView =  mViewDatabinding.tasksList;
+        final ScrollChildSwipeRefreshLayout swipeRefreshLayout = mViewDatabinding.refreshLayout;
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),

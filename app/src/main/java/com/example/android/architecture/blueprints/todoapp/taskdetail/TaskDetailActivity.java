@@ -23,24 +23,22 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.android.architecture.blueprints.todoapp.Event;
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskFragment;
+import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailActBinding;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
+import com.example.android.mvvm.base.BaseActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 /**
  * Displays task details screen.
  */
-public class TaskDetailActivity extends AppCompatActivity implements TaskDetailNavigator {
+public class TaskDetailActivity extends BaseActivity<TaskdetailActBinding, TaskDetailViewModel> implements TaskDetailNavigator {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
@@ -48,13 +46,14 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
     public static final int EDIT_RESULT_OK = RESULT_FIRST_USER + 3;
 
-    private TaskDetailViewModel mTaskViewModel;
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.taskdetail_act;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.taskdetail_act);
+    protected void initView() {
+        mViewModel.setmTasksRepository(Injection.provideTasksRepository(getApplicationContext()));
 
         setupToolbar();
 
@@ -62,10 +61,11 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
 
         ActivityUtils.replaceFragmentInActivity(getSupportFragmentManager(),
                 taskDetailFragment, R.id.contentFrame);
+    }
 
-        mTaskViewModel = obtainViewModel(this);
-
-        subscribeToNavigationChanges(mTaskViewModel);
+    @Override
+    protected void initData(Bundle savedInstanceState) {
+        subscribeToNavigationChanges(mViewModel);
     }
 
     @NonNull
@@ -82,17 +82,8 @@ public class TaskDetailActivity extends AppCompatActivity implements TaskDetailN
         return taskDetailFragment;
     }
 
-    @NonNull
-    public static TaskDetailViewModel obtainViewModel(FragmentActivity activity) {
-        // Use a Factory to inject dependencies into the ViewModel
-        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
-
-        return ViewModelProviders.of(activity, factory).get(TaskDetailViewModel.class);
-    }
-
     private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mViewDatabinding.toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowHomeEnabled(true);

@@ -17,35 +17,60 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 
 import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
+import com.example.android.mvvm.base.BaseFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 
 
 /**
  * Main UI for the task detail screen.
  */
-public class TaskDetailFragment extends Fragment {
+public class TaskDetailFragment extends BaseFragment<TaskdetailFragBinding, TaskDetailViewModel> {
 
     public static final String ARGUMENT_TASK_ID = "TASK_ID";
 
     public static final int REQUEST_EDIT_TASK = 1;
 
-    private TaskDetailViewModel mViewModel;
+
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.taskdetail_frag;
+    }
+
+    @Override
+    protected void initView() {
+
+        mViewModel = obtainViewModel(getActivity(), TaskDetailViewModel.class);
+
+        mViewDatabinding.setViewmodel(mViewModel);
+        mViewDatabinding.setLifecycleOwner(getActivity());
+
+        TaskDetailUserActionsListener actionsListener = getTaskDetailUserActionsListener();
+
+        mViewDatabinding.setListener(actionsListener);
+
+        setHasOptionsMenu(true);
+
+        setupFab();
+
+        setupSnackbar();
+    }
+
+    @Override
+    protected void initData(Bundle savedInstanceState) {
+
+    }
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -53,15 +78,6 @@ public class TaskDetailFragment extends Fragment {
         TaskDetailFragment fragment = new TaskDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setupFab();
-
-        setupSnackbar();
     }
 
     private void setupSnackbar() {
@@ -91,29 +107,6 @@ public class TaskDetailFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mViewModel.start(getArguments().getString(ARGUMENT_TASK_ID));
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.taskdetail_frag, container, false);
-
-        TaskdetailFragBinding viewDataBinding = TaskdetailFragBinding.bind(view);
-
-        mViewModel = TaskDetailActivity.obtainViewModel(getActivity());
-
-        viewDataBinding.setViewmodel(mViewModel);
-        viewDataBinding.setLifecycleOwner(getActivity());
-
-        TaskDetailUserActionsListener actionsListener = getTaskDetailUserActionsListener();
-
-        viewDataBinding.setListener(actionsListener);
-
-        setHasOptionsMenu(true);
-
-        return view;
     }
 
     private TaskDetailUserActionsListener getTaskDetailUserActionsListener() {

@@ -18,13 +18,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel" />
-    </data>
-
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"

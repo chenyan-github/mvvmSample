@@ -21,42 +21,42 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Event;
+import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.databinding.TasksActBinding;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
+import com.example.android.mvvm.base.BaseActivity;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 
-public class TasksActivity extends AppCompatActivity implements TaskItemNavigator, TasksNavigator {
-
-    private DrawerLayout mDrawerLayout;
-
-    private TasksViewModel mViewModel;
+public class TasksActivity extends BaseActivity<TasksActBinding, TasksViewModel> implements TaskItemNavigator, TasksNavigator {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.tasks_act);
+    protected int getLayoutResId() {
+        return R.layout.tasks_act;
+    }
+
+    @Override
+    protected void initView() {
+        mViewModel.setmTasksRepository(Injection.provideTasksRepository(getApplicationContext()));
 
         setupToolbar();
 
         setupNavigationDrawer();
 
         setupViewFragment();
+    }
 
-        mViewModel = obtainViewModel(this);
+    @Override
+    protected void initData(Bundle savedInstanceState) {
 
         // Subscribe to "open task" event
         mViewModel.getOpenTaskEvent().observe(this, new Observer<Event<String>>() {
@@ -81,16 +81,6 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
         });
     }
 
-    public static TasksViewModel obtainViewModel(FragmentActivity activity) {
-        // Use a Factory to inject dependencies into the ViewModel
-        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
-
-        TasksViewModel viewModel =
-                ViewModelProviders.of(activity, factory).get(TasksViewModel.class);
-
-        return viewModel;
-    }
-
     private void setupViewFragment() {
         TasksFragment tasksFragment =
                 (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
@@ -111,8 +101,7 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
     }
 
     private void setupNavigationDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
+        mViewDatabinding.drawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -124,7 +113,7 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
         switch (item.getItemId()) {
             case android.R.id.home:
                 // Open the navigation drawer when the home icon is selected from the toolbar.
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                mViewDatabinding.drawerLayout.openDrawer(GravityCompat.START);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -149,7 +138,7 @@ public class TasksActivity extends AppCompatActivity implements TaskItemNavigato
                         }
                         // Close the navigation drawer when an item is selected.
                         menuItem.setChecked(true);
-                        mDrawerLayout.closeDrawers();
+                        mViewDatabinding.drawerLayout.closeDrawers();
                         return true;
                     }
                 });

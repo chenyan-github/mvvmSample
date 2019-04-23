@@ -53,10 +53,10 @@ public class StatisticsViewModel extends ViewModel {
 
     private int mNumberOfCompletedTasks = 0;
 
-    private final TasksRepository mTasksRepository;
+    private TasksRepository mTasksRepository;
 
-    public StatisticsViewModel(TasksRepository tasksRepository) {
-        mTasksRepository = tasksRepository;
+    public void setmTasksRepository(TasksRepository mTasksRepository) {
+        this.mTasksRepository = mTasksRepository;
     }
 
     public void start() {

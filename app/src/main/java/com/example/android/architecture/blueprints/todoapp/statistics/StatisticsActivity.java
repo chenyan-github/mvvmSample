@@ -16,46 +16,34 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+
+import com.example.android.architecture.blueprints.todoapp.Injection;
+import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsActBinding;
+import com.example.android.mvvm.base.BaseActivity;
 import com.google.android.material.navigation.NavigationView;
-import androidx.fragment.app.FragmentActivity;
 import androidx.core.app.NavUtils;
 import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 /**
  * Show statistics for tasks.
  */
-public class StatisticsActivity extends AppCompatActivity {
-
-    private DrawerLayout mDrawerLayout;
+public class StatisticsActivity extends BaseActivity<StatisticsActBinding, StatisticsViewModel> {
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // Open the navigation drawer when the home icon is selected from the toolbar.
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    protected int getLayoutResId() {
+        return R.layout.statistics_act;
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.statistics_act);
+    protected void initView() {
+        mViewModel.setmTasksRepository(Injection.provideTasksRepository(getApplicationContext()));
 
         setupToolbar();
 
@@ -64,11 +52,19 @@ public class StatisticsActivity extends AppCompatActivity {
         findOrCreateViewFragment();
     }
 
-    public static StatisticsViewModel obtainViewModel(FragmentActivity activity) {
-        // Use a Factory to inject dependencies into the ViewModel
-        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
+    @Override
+    protected void initData(Bundle savedInstanceState) {
+    }
 
-        return ViewModelProviders.of(activity, factory).get(StatisticsViewModel.class);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Open the navigation drawer when the home icon is selected from the toolbar.
+                mViewDatabinding.drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @NonNull
@@ -84,17 +80,14 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void setupNavigationDrawer() {
-        mDrawerLayout = findViewById(R.id.drawer_layout);
-        mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        if (navigationView != null) {
-            setupDrawerContent(navigationView);
+        mViewDatabinding.drawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
+        if (mViewDatabinding.navView != null) {
+            setupDrawerContent(mViewDatabinding.navView);
         }
     }
 
     private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mViewDatabinding.toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setTitle(R.string.statistics_title);
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
@@ -118,7 +111,7 @@ public class StatisticsActivity extends AppCompatActivity {
                         }
                         // Close the navigation drawer when an item is selected.
                         menuItem.setChecked(true);
-                        mDrawerLayout.closeDrawers();
+                        mViewDatabinding.drawerLayout.closeDrawers();
                         return true;
                     }
                 });

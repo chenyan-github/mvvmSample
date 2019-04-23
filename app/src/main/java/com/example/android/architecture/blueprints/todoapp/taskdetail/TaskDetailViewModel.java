@@ -50,7 +50,7 @@ public class TaskDetailViewModel extends ViewModel implements TasksDataSource.Ge
 
     private final MutableLiveData<Event<Integer>> mSnackbarText = new MutableLiveData<>();
 
-    private final TasksRepository mTasksRepository;
+    private TasksRepository mTasksRepository;
 
     // This LiveData depends on another so we can use a transformation.
     public final LiveData<Boolean> completed = Transformations.map(mTask,
@@ -62,8 +62,8 @@ public class TaskDetailViewModel extends ViewModel implements TasksDataSource.Ge
                 }
             });
 
-    public TaskDetailViewModel(TasksRepository tasksRepository) {
-        mTasksRepository = tasksRepository;
+    public void setmTasksRepository(TasksRepository mTasksRepository) {
+        this.mTasksRepository = mTasksRepository;
     }
 
     public void deleteTask() {

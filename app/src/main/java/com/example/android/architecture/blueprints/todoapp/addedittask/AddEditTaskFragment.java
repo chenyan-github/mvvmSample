@@ -17,32 +17,51 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.Event;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.databinding.AddtaskFragBinding;
 import com.example.android.architecture.blueprints.todoapp.util.SnackbarUtils;
+import com.example.android.mvvm.base.BaseFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment {
+public class AddEditTaskFragment extends BaseFragment<AddtaskFragBinding, AddEditTaskViewModel> {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
 
-    private AddEditTaskViewModel mViewModel;
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.addtask_frag;
+    }
 
-    private AddtaskFragBinding mViewDataBinding;
+    @Override
+    protected void initView() {
+        mViewModel = obtainViewModel(getActivity(), AddEditTaskViewModel.class);
+        mViewDatabinding.setViewmodel(mViewModel);
+        mViewDatabinding.setLifecycleOwner(getActivity());
+
+        setHasOptionsMenu(true);
+        setRetainInstance(false);
+
+        setupFab();
+
+        setupSnackbar();
+
+        setupActionBar();
+    }
+
+    @Override
+    protected void initData(Bundle savedInstanceState) {
+        loadData();
+    }
 
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
@@ -52,19 +71,6 @@ public class AddEditTaskFragment extends Fragment {
         // Required empty public constructor
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setupFab();
-
-        setupSnackbar();
-
-        setupActionBar();
-
-        loadData();
-    }
-
     private void loadData() {
         // Add or edit an existing task?
         if (getArguments() != null) {
@@ -72,26 +78,6 @@ public class AddEditTaskFragment extends Fragment {
         } else {
             mViewModel.start(null);
         }
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        final View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        if (mViewDataBinding == null) {
-            mViewDataBinding = AddtaskFragBinding.bind(root);
-        }
-
-        mViewModel = AddEditTaskActivity.obtainViewModel(getActivity());
-
-        mViewDataBinding.setViewmodel(mViewModel);
-        mViewDataBinding.setLifecycleOwner(getActivity());
-
-        setHasOptionsMenu(true);
-        setRetainInstance(false);
-
-        return mViewDataBinding.getRoot();
     }
 
     private void setupSnackbar() {

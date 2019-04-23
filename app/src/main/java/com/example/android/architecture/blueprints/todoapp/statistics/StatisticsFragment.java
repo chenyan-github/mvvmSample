@@ -17,51 +17,42 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding;
-
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
+import com.example.android.mvvm.base.BaseFragment;
 
 /**
  * Main UI for the statistics screen.
  */
-public class StatisticsFragment extends Fragment {
+public class StatisticsFragment extends BaseFragment<StatisticsFragBinding, StatisticsViewModel> {
 
-    private StatisticsFragBinding mViewDataBinding;
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.statistics_frag;
+    }
 
-    private StatisticsViewModel mStatisticsViewModel;
+    @Override
+    protected void initView() {
+        mViewModel = obtainViewModel(getActivity(), StatisticsViewModel.class);
+
+        mViewDatabinding.setStats(mViewModel);
+        mViewDatabinding.setLifecycleOwner(getActivity());
+    }
+
+    @Override
+    protected void initData(Bundle savedInstanceState) {
+
+    }
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        mViewDataBinding = DataBindingUtil.inflate(
-                inflater, R.layout.statistics_frag, container, false);
-        return mViewDataBinding.getRoot();
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mStatisticsViewModel = StatisticsActivity.obtainViewModel(getActivity());
-        mViewDataBinding.setStats(mStatisticsViewModel);
-        mViewDataBinding.setLifecycleOwner(getActivity());
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        mStatisticsViewModel.start();
+        mViewModel.start();
     }
 
     public boolean isActive() {

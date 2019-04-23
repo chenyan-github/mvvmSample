@@ -72,16 +72,16 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     public <T extends ViewModel> T create(Class<T> modelClass) {
         if (modelClass.isAssignableFrom(StatisticsViewModel.class)) {
             //noinspection unchecked
-            return (T) new StatisticsViewModel(mTasksRepository);
+            return (T) new StatisticsViewModel();
         } else if (modelClass.isAssignableFrom(TaskDetailViewModel.class)) {
             //noinspection unchecked
-            return (T) new TaskDetailViewModel(mTasksRepository);
+            return (T) new TaskDetailViewModel();
         } else if (modelClass.isAssignableFrom(AddEditTaskViewModel.class)) {
             //noinspection unchecked
-            return (T) new AddEditTaskViewModel(mTasksRepository);
+            return (T) new AddEditTaskViewModel();
         } else if (modelClass.isAssignableFrom(TasksViewModel.class)) {
             //noinspection unchecked
-            return (T) new TasksViewModel(mTasksRepository);
+            return (T) new TasksViewModel();
         }
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
     }
